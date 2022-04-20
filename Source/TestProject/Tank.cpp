@@ -43,32 +43,12 @@ void ATank::Tick(float DeltaTime)
 	PathParams.LaunchVelocity = Barrel->GetSocketRotation(FName("Projectile")).Vector() * LaunchSpeed;
 	PathParams.ProjectileRadius = 20.0f;
 	PathParams.SimFrequency = 15.0f;
-	PathParams.MaxSimTime = 2.0f;
+	PathParams.MaxSimTime = 8.0f;
 	PathParams.bTraceWithCollision = true;
 	PathParams.DrawDebugType = EDrawDebugTrace::ForDuration;
-	PathParams.DrawDebugTime = 0.1;
+	PathParams.DrawDebugTime = 0.05;
 
 	UGameplayStatics::PredictProjectilePath(this, PathParams, PathResult);
-	UE_LOG(LogTemp, Warning, TEXT("Predict projectile path length is %d"), PathResult.PathData.Num());
-	size_t PathLength = PathResult.PathData.Num();
-	for (size_t i = 0; i < PathLength; i++)
-	{
-		SplineComponent->AddSplinePoint(PathResult.PathData[i].Location, ESplineCoordinateSpace::World);
-
-	}
-	SplineComponent->SetSplinePointType(PathLength - 1, ESplinePointType::CurveClamped);
-	size_t SplineLength = SplineComponent->GetNumberOfSplinePoints();
-	for (size_t i = 0; i < SplineLength - 2; i++)
-	{
-		USplineMeshComponent* SplineMeshComponent = NewObject<USplineMeshComponent>(this, USplineMeshComponent::StaticClass());
-		SplineMeshComponent->RegisterComponentWithWorld(GetWorld());
-		SplineMeshComponent->SetMobility(EComponentMobility::Movable);
-		SplineMeshComponent->AttachToComponent(SplineComponent, FAttachmentTransformRules::KeepWorldTransform);
-		SplineMeshComponent->SetStaticMesh(SplineMesh);
-		SplineMeshComponent->SetStartAndEnd(PathResult.PathData[i].Location, SplineComponent->GetTangentAtSplinePoint(i, ESplineCoordinateSpace::World), PathResult.PathData[i + 1].Location, SplineComponent->GetTangentAtSplinePoint(i + 1, ESplineCoordinateSpace::World));
-		//SplineMeshComponents.Add(SplineMeshComponent);
-	}
-	
 }
 
 // Called to bind functionality to input
